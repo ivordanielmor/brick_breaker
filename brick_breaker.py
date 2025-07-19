@@ -1,14 +1,15 @@
-# 3. Téglafal kirajzolása
-# Most már csak minden frame-ben végig kell menni a bricks listán, és minden téglát kirajzolni:
-# A szín minden sorban más (így lesz látványos), és vékony kerettel is megjelenítjük.
+# HÁZI FELADAT
+# • Színezd minden sort más színnel (pl. első sor piros, második sárga…).
+# • Adj hozzá egy R billentyűt, ami újragenerálja az egész téglafalat, ha lenyomod! (Tipp: ehhez elég újra lefuttatni ugyanazt a brick-generáló ciklust.)
 
 import pygame
+import random
 
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Téglafal és ütő")
+pygame.display.set_caption("Téglafal és ütő újragenerálás")
 
 brick_width = 75
 brick_height = 20
@@ -28,13 +29,21 @@ row_colors = [
     (0, 0, 255)
 ]
 
-bricks = []
-for row in range(rows):
-    for col in range(cols):
-        brick_x = start_x + col * (brick_width + brick_gap)
-        brick_y = start_y + row * (brick_height + brick_gap)
-        brick = pygame.Rect(brick_x, brick_y, brick_width, brick_height)
-        bricks.append((brick, row_colors[row]))
+def generate_bricks():
+    bricks = []
+    row_colors = get_random_row_colors()
+    for row in range(rows):
+        for col in range(cols):
+            brick_x = start_x + col * (brick_width + brick_gap)
+            brick_y = start_y + row * (brick_height + brick_gap)
+            brick = pygame.Rect(brick_x, brick_y, brick_width, brick_height)
+            bricks.append((brick, row_colors[row]))
+    return bricks
+
+def get_random_row_colors():
+    return [tuple(random.randint(50, 255) for _ in range(3)) for _ in range(rows)]
+
+bricks = generate_bricks()
 
 paddle = pygame.Rect(350, 550, 100, 10)
 paddle_speed = 5
@@ -46,6 +55,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                bricks = generate_bricks()
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:

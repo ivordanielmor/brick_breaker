@@ -1,5 +1,8 @@
-# 3. Ütközés az ütővel
-# Ha a labda eltalálja az ütőt (paddle):
+# 4. Tégla-ütközés és törlés
+# Végig kell menni minden téglán, és megnézni, hogy a labda ütközik-e vele. Ha igen:
+# – fordítsd meg a dy irányt (pattanás)
+# – töröld a téglát a listából (így eltűnik)
+# – növeld a pontszámot
 
 import pygame
 import random
@@ -42,6 +45,8 @@ paddle_speed = 5
 ball = pygame.Rect(WIDTH // 2, HEIGHT // 2, 15, 15)
 dx, dy = 4, -4
 
+score = 0
+
 clock = pygame.time.Clock()
 running = True
 
@@ -51,6 +56,7 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
             bricks = generate_bricks()
+            score = 0
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -75,6 +81,14 @@ while running:
     if ball.colliderect(paddle):
         dy *= -1
 
+    for brick in bricks[:]:
+        rect, color = brick
+        if ball.colliderect(rect):
+            dy *= -1
+            bricks.remove(brick)
+            score += 1
+            break
+
     screen.fill((0, 0, 0))
 
     for brick, color in bricks:
@@ -83,6 +97,10 @@ while running:
 
     pygame.draw.rect(screen, (255, 255, 255), paddle)
     pygame.draw.ellipse(screen, (255, 255, 255), ball)
+
+    font = pygame.font.SysFont(None, 36)
+    score_text = font.render(f"Pontszám: {score}", True, (255, 255, 255))
+    screen.blit(score_text, (10, 10))
 
     pygame.display.flip()
     clock.tick(60)

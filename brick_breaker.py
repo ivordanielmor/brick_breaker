@@ -1,8 +1,6 @@
-# 4. Tégla-ütközés és törlés
-# Végig kell menni minden téglán, és megnézni, hogy a labda ütközik-e vele. Ha igen:
-# – fordítsd meg a dy irányt (pattanás)
-# – töröld a téglát a listából (így eltűnik)
-# – növeld a pontszámot
+# HÁZI FELADAT
+# • Valósítsd meg a “level up” funkciót: Ha elfogynak a téglák, írj ki “You Win!” üzenetet, és az N billentyűvel indíts új szintet (rakj ki új falat, legyen gyorsabb a labda)!
+# • Adj hozzá hangot a téglákhoz: minden törésnél szólaljon meg egy hangeffekt (pl. pygame.mixer.Sound('brick.wav').play()).
 
 import pygame
 import random
@@ -11,7 +9,9 @@ pygame.init()
 
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Falütközés teszt")
+pygame.display.set_caption("Breakout - Level Up és Hang")
+
+brick_sound = pygame.mixer.Sound('brick.mp3')
 
 brick_width = 75
 brick_height = 20
@@ -46,6 +46,8 @@ ball = pygame.Rect(WIDTH // 2, HEIGHT // 2, 15, 15)
 dx, dy = 4, -4
 
 score = 0
+level = 1
+game_won = False
 
 clock = pygame.time.Clock()
 running = True
@@ -54,9 +56,22 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-            bricks = generate_bricks()
-            score = 0
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                bricks = generate_bricks()
+                score = 0
+                level = 1
+                dx, dy = 4, -4
+                game_won = False
+            if event.key == pygame.K_n and game_won:
+                bricks = generate_bricks()
+                score = 0
+                level += 1
+                dx *= 1.2
+                dy *= 1.2
+                ball.x = WIDTH // 2
+                ball.y = HEIGHT // 2
+                game_won = False
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -66,8 +81,9 @@ while running:
         paddle.x += paddle_speed
         paddle.x = min(paddle.x, WIDTH - paddle.width)
 
-    ball.x += dx
-    ball.y += dy
+    if not game_won:
+        ball.x += dx
+        ball.y += dy
 
     if ball.left <= 0 or ball.right >= WIDTH:
         dx *= -1
@@ -76,7 +92,7 @@ while running:
     if ball.bottom >= HEIGHT:
         ball.x = WIDTH // 2
         ball.y = HEIGHT // 2
-        dx, dy = 4, -4
+        dx, dy = 4 * level, -4 * level
 
     if ball.colliderect(paddle):
         dy *= -1
@@ -86,8 +102,12 @@ while running:
         if ball.colliderect(rect):
             dy *= -1
             bricks.remove(brick)
+            brick_sound.play()
             score += 1
             break
+
+    if len(bricks) == 0:
+        game_won = True
 
     screen.fill((0, 0, 0))
 
@@ -99,8 +119,15 @@ while running:
     pygame.draw.ellipse(screen, (255, 255, 255), ball)
 
     font = pygame.font.SysFont(None, 36)
-    score_text = font.render(f"Pontszám: {score}", True, (255, 255, 255))
+    score_text = font.render(f"Pontszám: {score}   Szint: {level}", True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
+
+    if game_won:
+        win_font = pygame.font.SysFont(None, 72)
+        win_text = win_font.render("YOU WIN!", True, (255, 255, 0))
+        screen.blit(win_text, (WIDTH // 2 - 150, HEIGHT // 2 - 50))
+        info_text = font.render("Nyomj N-t az új szinthez", True, (255, 255, 255))
+        screen.blit(info_text, (WIDTH // 2 - 150, HEIGHT // 2 + 20))
 
     pygame.display.flip()
     clock.tick(60)

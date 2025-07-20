@@ -1,6 +1,5 @@
-# HÁZI FELADAT
-# • Színezd minden sort más színnel (pl. első sor piros, második sárga…).
-# • Adj hozzá egy R billentyűt, ami újragenerálja az egész téglafalat, ha lenyomod! (Tipp: ehhez elég újra lefuttatni ugyanazt a brick-generáló ciklust.)
+# 1. Labda mozgása
+# A labdát a sebességvektorával mozgatod minden frame-ben:
 
 import pygame
 import random
@@ -21,14 +20,6 @@ wall_width = cols * brick_width + (cols - 1) * brick_gap
 start_x = (WIDTH - wall_width) // 2
 start_y = 50
 
-row_colors = [
-    (255, 0, 0),
-    (255, 165, 0),
-    (255, 255, 0),
-    (0, 128, 0),
-    (0, 0, 255)
-]
-
 def generate_bricks():
     bricks = []
     row_colors = get_random_row_colors()
@@ -47,6 +38,9 @@ bricks = generate_bricks()
 
 paddle = pygame.Rect(350, 550, 100, 10)
 paddle_speed = 5
+
+ball = pygame.Rect(WIDTH // 2, HEIGHT // 2, 15, 15)
+dx, dy = 4, -4
 
 clock = pygame.time.Clock()
 
@@ -69,6 +63,9 @@ while running:
         if paddle.x > WIDTH - paddle.width:
             paddle.x = WIDTH - paddle.width
 
+    ball.x += dx
+    ball.y += dy
+
     screen.fill((0, 0, 0))
 
     for brick, color in bricks:
@@ -76,6 +73,7 @@ while running:
         pygame.draw.rect(screen, (255, 255, 255), brick, 2)
 
     pygame.draw.rect(screen, (255, 255, 255), paddle)
+    pygame.draw.ellipse(screen, (255, 255, 255), ball)
 
     pygame.display.flip()
     clock.tick(60)

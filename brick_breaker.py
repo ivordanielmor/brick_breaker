@@ -1,5 +1,5 @@
-# 2. Falütközés
-# Ha a labda eléri a pálya szélét (bal/jobb vagy feklső/alsó)
+# 3. Ütközés az ütővel
+# Ha a labda eltalálja az ütőt (paddle):
 
 import pygame
 import random
@@ -16,7 +16,6 @@ brick_gap = 5
 rows = 5
 cols = 10
 
-# Fal szélesség kiszámítása, hogy középre tudd igazítani
 wall_width = cols * brick_width + (cols - 1) * brick_gap
 start_x = (WIDTH - wall_width) // 2
 start_y = 50
@@ -72,6 +71,9 @@ while running:
         ball.x = WIDTH // 2
         ball.y = HEIGHT // 2
         dx, dy = 4, -4
+
+    if ball.colliderect(paddle):
+        dy *= -1
 
     screen.fill((0, 0, 0))
 

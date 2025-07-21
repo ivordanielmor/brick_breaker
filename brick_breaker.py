@@ -1,5 +1,5 @@
-# 1. Paddle-ütközés hang
-# Mixer indítása, effekt betöltése, lejátszás ütközéskor:
+# 3. Háttérzene indítása
+# A játék elején indítsd el loop-pal:
 
 import pygame
 import random
@@ -10,10 +10,15 @@ pygame.init()
 pygame.mixer.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Breakout - Level Up és Hang")
+pygame.display.set_caption("Brickbreaker")
 
+# Hangok betöltése
 brick_sound = pygame.mixer.Sound('brick.mp3')
-paddle_sound = pygame.mixer.Sound('paddlesound.mp3')  # új hang paddle-ütközéshez
+paddle_sound = pygame.mixer.Sound('paddlesound.mp3')
+
+# Háttérzene indítása loop-pal
+pygame.mixer.music.load('backgroundsound.mp3')
+pygame.mixer.music.play(-1)  # Végtelenített lejátszás
 
 brick_width = 75
 brick_height = 20
@@ -98,7 +103,7 @@ while running:
 
     if ball.colliderect(paddle):
         dy *= -1
-        paddle_sound.play()  # hang lejátszása paddle-ütközéskor
+        paddle_sound.play()
 
     for brick in bricks[:]:
         rect, color = brick

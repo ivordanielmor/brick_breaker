@@ -1,5 +1,5 @@
-# 3. Háttérzene indítása
-# A játék elején indítsd el loop-pal:
+# 4. Hangerőszabályozás billentyűkkel
+# A játékos a "+" vagy "-" billentyűkkel változtatja a hangerőt:
 
 import pygame
 import random
@@ -19,6 +19,11 @@ paddle_sound = pygame.mixer.Sound('paddlesound.mp3')
 # Háttérzene indítása loop-pal
 pygame.mixer.music.load('backgroundsound.mp3')
 pygame.mixer.music.play(-1)  # Végtelenített lejátszás
+
+volume = 0.5  # Kezdő hangerő
+pygame.mixer.music.set_volume(volume)
+brick_sound.set_volume(volume)
+paddle_sound.set_volume(volume)
 
 brick_width = 75
 brick_height = 20
@@ -79,6 +84,18 @@ while running:
                 ball.x = WIDTH // 2
                 ball.y = HEIGHT // 2
                 game_won = False
+            # Hangerő növelése
+            if event.key == pygame.K_PLUS or event.key == pygame.K_KP_PLUS:
+                volume = min(volume + 0.1, 1.0)
+                pygame.mixer.music.set_volume(volume)
+                brick_sound.set_volume(volume)
+                paddle_sound.set_volume(volume)
+            # Hangerő csökkentése
+            if event.key == pygame.K_MINUS or event.key == pygame.K_KP_MINUS:
+                volume = max(volume - 0.1, 0.0)
+                pygame.mixer.music.set_volume(volume)
+                brick_sound.set_volume(volume)
+                paddle_sound.set_volume(volume)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:

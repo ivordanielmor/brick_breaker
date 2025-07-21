@@ -1,5 +1,7 @@
-# 4. Hangerőszabályozás billentyűkkel
-# A játékos a "+" vagy "-" billentyűkkel változtatja a hangerőt:
+# HÁZI FELADAT
+# Vezess be legalább egy új effekt (pl. játék végén lose.wav).
+# Készíts menüt (M billentyű), ami megállítja vagy újraindítja a háttérzenét
+# (pl. pygame.mixer.music.pause() / .unpause()).
 
 import pygame
 import random
@@ -15,6 +17,7 @@ pygame.display.set_caption("Brickbreaker")
 # Hangok betöltése
 brick_sound = pygame.mixer.Sound('brick.mp3')
 paddle_sound = pygame.mixer.Sound('paddlesound.mp3')
+lose_sound = pygame.mixer.Sound('lose.mp3')  # 🔊 Új hangeffekt betöltése
 
 # Háttérzene indítása loop-pal
 pygame.mixer.music.load('backgroundsound.mp3')
@@ -24,6 +27,7 @@ volume = 0.5  # Kezdő hangerő
 pygame.mixer.music.set_volume(volume)
 brick_sound.set_volume(volume)
 paddle_sound.set_volume(volume)
+lose_sound.set_volume(volume)
 
 brick_width = 75
 brick_height = 20
@@ -60,6 +64,7 @@ dx, dy = 4, -4
 score = 0
 level = 1
 game_won = False
+paused_music = False  # 🎵 Menüállapot
 
 clock = pygame.time.Clock()
 running = True
@@ -68,13 +73,25 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
         if event.type == pygame.KEYDOWN:
+            # Menü billentyű
+            if event.key == pygame.K_m:
+                if paused_music:
+                    pygame.mixer.music.unpause()
+                else:
+                    pygame.mixer.music.pause()
+                paused_music = not paused_music
+
             if event.key == pygame.K_r:
                 bricks = generate_bricks()
                 score = 0
                 level = 1
                 dx, dy = 4, -4
                 game_won = False
+                ball.x = WIDTH // 2
+                ball.y = HEIGHT // 2
+
             if event.key == pygame.K_n and game_won:
                 bricks = generate_bricks()
                 score = 0
@@ -84,18 +101,21 @@ while running:
                 ball.x = WIDTH // 2
                 ball.y = HEIGHT // 2
                 game_won = False
+
             # Hangerő növelése
-            if event.key == pygame.K_PLUS or event.key == pygame.K_KP_PLUS:
+            if event.key == pygame.K_EQUALS or event.key == pygame.K_KP_PLUS:
                 volume = min(volume + 0.1, 1.0)
                 pygame.mixer.music.set_volume(volume)
                 brick_sound.set_volume(volume)
                 paddle_sound.set_volume(volume)
+                lose_sound.set_volume(volume)
             # Hangerő csökkentése
             if event.key == pygame.K_MINUS or event.key == pygame.K_KP_MINUS:
                 volume = max(volume - 0.1, 0.0)
                 pygame.mixer.music.set_volume(volume)
                 brick_sound.set_volume(volume)
                 paddle_sound.set_volume(volume)
+                lose_sound.set_volume(volume)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -114,6 +134,8 @@ while running:
     if ball.top <= 0:
         dy *= -1
     if ball.bottom >= HEIGHT:
+        # 👇 Lose effekt lejátszása
+        lose_sound.play()
         ball.x = WIDTH // 2
         ball.y = HEIGHT // 2
         dx, dy = 4 * level, -4 * level

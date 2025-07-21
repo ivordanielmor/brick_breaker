@@ -1,17 +1,19 @@
-# HÁZI FELADAT
-# • Valósítsd meg a “level up” funkciót: Ha elfogynak a téglák, írj ki “You Win!” üzenetet, és az N billentyűvel indíts új szintet (rakj ki új falat, legyen gyorsabb a labda)!
-# • Adj hozzá hangot a téglákhoz: minden törésnél szólaljon meg egy hangeffekt (pl. pygame.mixer.Sound('brick.wav').play()).
+# 1. Paddle-ütközés hang
+# Mixer indítása, effekt betöltése, lejátszás ütközéskor:
 
 import pygame
 import random
 
-pygame.init()
-
 WIDTH, HEIGHT = 800, 600
+
+pygame.init()
+pygame.mixer.init()
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Breakout - Level Up és Hang")
 
 brick_sound = pygame.mixer.Sound('brick.mp3')
+paddle_sound = pygame.mixer.Sound('paddlesound.mp3')  # új hang paddle-ütközéshez
 
 brick_width = 75
 brick_height = 20
@@ -96,6 +98,7 @@ while running:
 
     if ball.colliderect(paddle):
         dy *= -1
+        paddle_sound.play()  # hang lejátszása paddle-ütközéskor
 
     for brick in bricks[:]:
         rect, color = brick

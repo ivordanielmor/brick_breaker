@@ -1,129 +1,113 @@
-# HÁZI FELADAT
-# Vezess be legalább egy új effekt (pl. játék végén lose.wav).
-# Készíts menüt (M billentyű), ami megállítja vagy újraindítja a háttérzenét
-# (pl. pygame.mixer.music.pause() / .unpause()).
+# # 1. Tégla-flash
+# # Villanó animáció, csak az adott téglán:
 
 import pygame
 import random
+import time
 
 WIDTH, HEIGHT = 800, 600
+BRICK_WIDTH = 75
+BRICK_HEIGHT = 20
+BRICK_GAP = 5
+ROWS = 5
+COLS = 10
+PADDLE_SPEED = 5
+BALL_SIZE = 15
+FLASH_DURATION = 100
+WHITE = (255, 255, 255)
 
 pygame.init()
 pygame.mixer.init()
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Brickbreaker")
+clock = pygame.time.Clock()
 
-# Hangok betöltése
 brick_sound = pygame.mixer.Sound('brick.mp3')
 paddle_sound = pygame.mixer.Sound('paddlesound.mp3')
-lose_sound = pygame.mixer.Sound('lose.mp3')  # 🔊 Új hangeffekt betöltése
-
-# Háttérzene indítása loop-pal
+lose_sound = pygame.mixer.Sound('lose.mp3')
 pygame.mixer.music.load('backgroundsound.mp3')
-pygame.mixer.music.play(-1)  # Végtelenített lejátszás
+pygame.mixer.music.play(-1)
 
-volume = 0.5  # Kezdő hangerő
+volume = 0.5
 pygame.mixer.music.set_volume(volume)
 brick_sound.set_volume(volume)
 paddle_sound.set_volume(volume)
 lose_sound.set_volume(volume)
 
-brick_width = 75
-brick_height = 20
-brick_gap = 5
-rows = 5
-cols = 10
-
-wall_width = cols * brick_width + (cols - 1) * brick_gap
-start_x = (WIDTH - wall_width) // 2
-start_y = 50
-
 def get_random_row_colors():
-    return [tuple(random.randint(50, 255) for _ in range(3)) for _ in range(rows)]
+    return [tuple(random.randint(50, 255) for _ in range(3)) for _ in range(ROWS)]
 
 def generate_bricks():
     bricks = []
     row_colors = get_random_row_colors()
-    for row in range(rows):
-        for col in range(cols):
-            x = start_x + col * (brick_width + brick_gap)
-            y = start_y + row * (brick_height + brick_gap)
-            brick = pygame.Rect(x, y, brick_width, brick_height)
+    wall_width = COLS * BRICK_WIDTH + (COLS - 1) * BRICK_GAP
+    start_x = (WIDTH - wall_width) // 2
+    start_y = 50
+    for row in range(ROWS):
+        for col in range(COLS):
+            x = start_x + col * (BRICK_WIDTH + BRICK_GAP)
+            y = start_y + row * (BRICK_HEIGHT + BRICK_GAP)
+            brick = pygame.Rect(x, y, BRICK_WIDTH, BRICK_HEIGHT)
             bricks.append((brick, row_colors[row]))
     return bricks
 
 bricks = generate_bricks()
+flash_bricks = []
 
 paddle = pygame.Rect(350, 550, 100, 10)
-paddle_speed = 5
-
-ball = pygame.Rect(WIDTH // 2, HEIGHT // 2, 15, 15)
+ball = pygame.Rect(WIDTH // 2, HEIGHT // 2, BALL_SIZE, BALL_SIZE)
 dx, dy = 4, -4
-
 score = 0
 level = 1
 game_won = False
-paused_music = False  # 🎵 Menüállapot
+paused_music = False
 
-clock = pygame.time.Clock()
 running = True
-
 while running:
+    current_time = pygame.time.get_ticks()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            # Menü billentyű
             if event.key == pygame.K_m:
-                if paused_music:
-                    pygame.mixer.music.unpause()
-                else:
-                    pygame.mixer.music.pause()
                 paused_music = not paused_music
-
+                if paused_music:
+                    pygame.mixer.music.pause()
+                else:
+                    pygame.mixer.music.unpause()
             if event.key == pygame.K_r:
                 bricks = generate_bricks()
+                flash_bricks = []
                 score = 0
                 level = 1
                 dx, dy = 4, -4
                 game_won = False
-                ball.x = WIDTH // 2
-                ball.y = HEIGHT // 2
-
+                ball.x, ball.y = WIDTH // 2, HEIGHT // 2
             if event.key == pygame.K_n and game_won:
                 bricks = generate_bricks()
+                flash_bricks = []
                 score = 0
                 level += 1
                 dx *= 1.2
                 dy *= 1.2
-                ball.x = WIDTH // 2
-                ball.y = HEIGHT // 2
+                ball.x, ball.y = WIDTH // 2, HEIGHT // 2
                 game_won = False
-
-            # Hangerő növelése
-            if event.key == pygame.K_EQUALS or event.key == pygame.K_KP_PLUS:
+            if event.key in [pygame.K_EQUALS, pygame.K_KP_PLUS]:
                 volume = min(volume + 0.1, 1.0)
-                pygame.mixer.music.set_volume(volume)
-                brick_sound.set_volume(volume)
-                paddle_sound.set_volume(volume)
-                lose_sound.set_volume(volume)
-            # Hangerő csökkentése
-            if event.key == pygame.K_MINUS or event.key == pygame.K_KP_MINUS:
+            if event.key in [pygame.K_MINUS, pygame.K_KP_MINUS]:
                 volume = max(volume - 0.1, 0.0)
-                pygame.mixer.music.set_volume(volume)
-                brick_sound.set_volume(volume)
-                paddle_sound.set_volume(volume)
-                lose_sound.set_volume(volume)
+            pygame.mixer.music.set_volume(volume)
+            brick_sound.set_volume(volume)
+            paddle_sound.set_volume(volume)
+            lose_sound.set_volume(volume)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        paddle.x -= paddle_speed
-        paddle.x = max(paddle.x, 0)
+        paddle.x = max(paddle.x - PADDLE_SPEED, 0)
     if keys[pygame.K_RIGHT]:
-        paddle.x += paddle_speed
-        paddle.x = min(paddle.x, WIDTH - paddle.width)
+        paddle.x = min(paddle.x + PADDLE_SPEED, WIDTH - paddle.width)
 
     if not game_won:
         ball.x += dx
@@ -134,10 +118,8 @@ while running:
     if ball.top <= 0:
         dy *= -1
     if ball.bottom >= HEIGHT:
-        # 👇 Lose effekt lejátszása
         lose_sound.play()
-        ball.x = WIDTH // 2
-        ball.y = HEIGHT // 2
+        ball.x, ball.y = WIDTH // 2, HEIGHT // 2
         dx, dy = 4 * level, -4 * level
 
     if ball.colliderect(paddle):
@@ -148,10 +130,13 @@ while running:
         rect, color = brick
         if ball.colliderect(rect):
             dy *= -1
-            bricks.remove(brick)
             brick_sound.play()
+            bricks.remove(brick)
+            flash_bricks.append((rect, current_time))
             score += 1
             break
+
+    flash_bricks = [(rect, start_time) for rect, start_time in flash_bricks if current_time - start_time < FLASH_DURATION]
 
     if len(bricks) == 0:
         game_won = True
@@ -160,21 +145,21 @@ while running:
 
     for brick, color in bricks:
         pygame.draw.rect(screen, color, brick)
-        pygame.draw.rect(screen, (255, 255, 255), brick, 2)
+        pygame.draw.rect(screen, WHITE, brick, 2)
 
-    pygame.draw.rect(screen, (255, 255, 255), paddle)
-    pygame.draw.ellipse(screen, (255, 255, 255), ball)
+    for rect, _ in flash_bricks:
+        pygame.draw.rect(screen, WHITE, rect)
+
+    pygame.draw.rect(screen, WHITE, paddle)
+    pygame.draw.ellipse(screen, WHITE, ball)
 
     font = pygame.font.SysFont(None, 36)
-    score_text = font.render(f"Pontszám: {score}   Szint: {level}", True, (255, 255, 255))
-    screen.blit(score_text, (10, 10))
+    screen.blit(font.render(f"Pontszám: {score}   Szint: {level}", True, WHITE), (10, 10))
 
     if game_won:
         win_font = pygame.font.SysFont(None, 72)
-        win_text = win_font.render("YOU WIN!", True, (255, 255, 0))
-        screen.blit(win_text, (WIDTH // 2 - 150, HEIGHT // 2 - 50))
-        info_text = font.render("Nyomj N-t az új szinthez", True, (255, 255, 255))
-        screen.blit(info_text, (WIDTH // 2 - 150, HEIGHT // 2 + 20))
+        screen.blit(win_font.render("YOU WIN!", True, (255, 255, 0)), (WIDTH // 2 - 150, HEIGHT // 2 - 50))
+        screen.blit(font.render("Nyomj N-t az új szinthez", True, WHITE), (WIDTH // 2 - 150, HEIGHT // 2 + 20))
 
     pygame.display.flip()
     clock.tick(60)

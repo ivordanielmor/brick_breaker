@@ -1,5 +1,7 @@
-# 3. Ütő squash-animáció
-# Ütő összenyomódása találat után:
+# HÁZI FELADAT
+# • Tervezd meg saját animációs effekted (pl. tégla összeomlás pixeles
+# darabokra).
+# • Állítsd be, hogy a flash animáció színe változzon a tégla értéke alapján.
 
 import pygame
 import random
@@ -53,8 +55,30 @@ def generate_bricks():
             bricks.append((brick, row_colors[row]))
     return bricks
 
+def create_particles(rect, color):
+    particles = []
+    for _ in range(15):
+        size = random.randint(3, 6)
+        x = rect.centerx
+        y = rect.centery
+        dx = random.uniform(-2, 2)
+        dy = random.uniform(-2, 2)
+        lifetime = random.randint(300, 600)
+        particles.append({
+            "x": x,
+            "y": y,
+            "dx": dx,
+            "dy": dy,
+            "size": size,
+            "color": color,
+            "spawn_time": pygame.time.get_ticks(),
+            "lifetime": lifetime
+        })
+    return particles
+
 bricks = generate_bricks()
 flash_bricks = []
+particle_effects = []
 
 paddle = pygame.Rect(350, 550, 100, 10)
 ball = pygame.Rect(WIDTH // 2, HEIGHT // 2, BALL_SIZE, BALL_SIZE)
@@ -69,6 +93,10 @@ TRAIL_LENGTH = 10
 
 squash_start_time = 0
 is_squashing = False
+
+popup_start_time = 0
+popup_duration = 500
+show_popup = False
 
 running = True
 while running:
@@ -88,6 +116,7 @@ while running:
             if event.key == pygame.K_r:
                 bricks = generate_bricks()
                 flash_bricks = []
+                particle_effects = []
                 score = 0
                 level = 1
                 dx, dy = 4, -4
@@ -97,6 +126,7 @@ while running:
             if event.key == pygame.K_n and game_won:
                 bricks = generate_bricks()
                 flash_bricks = []
+                particle_effects = []
                 score = 0
                 level += 1
                 dx *= 1.2
@@ -122,7 +152,6 @@ while running:
     if not game_won:
         ball.x += dx
         ball.y += dy
-
         ball_trail.append((ball.centerx, ball.centery))
         if len(ball_trail) > TRAIL_LENGTH:
             ball_trail.pop(0)
@@ -149,12 +178,14 @@ while running:
             dy *= -1
             brick_sound.play()
             bricks.remove(brick)
-            flash_bricks.append((rect, current_time))
+            flash_bricks.append((rect, color, current_time))
+            particle_effects.extend(create_particles(rect, color))
             score += 1
+            popup_start_time = current_time
+            show_popup = True
             break
 
-    flash_bricks = [(rect, start_time) for rect, start_time in flash_bricks if current_time - start_time < FLASH_DURATION]
-
+    flash_bricks = [(rect, color, start_time) for rect, color, start_time in flash_bricks if current_time - start_time < FLASH_DURATION]
     if len(bricks) == 0:
         game_won = True
 
@@ -164,8 +195,8 @@ while running:
         pygame.draw.rect(screen, color, brick)
         pygame.draw.rect(screen, WHITE, brick, 2)
 
-    for rect, _ in flash_bricks:
-        pygame.draw.rect(screen, WHITE, rect)
+    for rect, color, _ in flash_bricks:
+        pygame.draw.rect(screen, color, rect)
 
     for i, (x, y) in enumerate(ball_trail):
         alpha = int(255 * (i + 1) / TRAIL_LENGTH)
@@ -188,8 +219,29 @@ while running:
 
     pygame.draw.ellipse(screen, WHITE, ball)
 
+    for particle in particle_effects[:]:
+        age = current_time - particle["spawn_time"]
+        if age > particle["lifetime"]:
+            particle_effects.remove(particle)
+            continue
+        particle["x"] += particle["dx"]
+        particle["y"] += particle["dy"]
+        alpha = max(0, 255 - int(255 * (age / particle["lifetime"])))
+        surf = pygame.Surface((particle["size"], particle["size"]), pygame.SRCALPHA)
+        surf.fill((*particle["color"], alpha))
+        screen.blit(surf, (particle["x"], particle["y"]))
+
     font = pygame.font.SysFont(None, 36)
     screen.blit(font.render(f"Pontszám: {score}   Szint: {level}", True, WHITE), (10, 10))
+
+    if show_popup and current_time - popup_start_time < popup_duration:
+        popup_font = pygame.font.SysFont(None, 100)
+        popup_surface = popup_font.render("+1", True, (255, 255, 255))
+        popup_surface.set_alpha(200 - int(200 * (current_time - popup_start_time) / popup_duration))
+        popup_rect = popup_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(popup_surface, popup_rect)
+    else:
+        show_popup = False
 
     if game_won:
         win_font = pygame.font.SysFont(None, 72)

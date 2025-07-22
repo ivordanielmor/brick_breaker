@@ -1,5 +1,5 @@
-# # 1. Tégla-flash
-# # Villanó animáció, csak az adott téglán:
+# 2. Labda „trail” effekt
+# Tárolj rövid listát az előző pozíciókból, és minden frame-ben rajzold ki halvány körként:
 
 import pygame
 import random
@@ -62,6 +62,9 @@ level = 1
 game_won = False
 paused_music = False
 
+ball_trail = []
+TRAIL_LENGTH = 10
+
 running = True
 while running:
     current_time = pygame.time.get_ticks()
@@ -85,6 +88,7 @@ while running:
                 dx, dy = 4, -4
                 game_won = False
                 ball.x, ball.y = WIDTH // 2, HEIGHT // 2
+                ball_trail = []
             if event.key == pygame.K_n and game_won:
                 bricks = generate_bricks()
                 flash_bricks = []
@@ -94,6 +98,7 @@ while running:
                 dy *= 1.2
                 ball.x, ball.y = WIDTH // 2, HEIGHT // 2
                 game_won = False
+                ball_trail = []
             if event.key in [pygame.K_EQUALS, pygame.K_KP_PLUS]:
                 volume = min(volume + 0.1, 1.0)
             if event.key in [pygame.K_MINUS, pygame.K_KP_MINUS]:
@@ -113,6 +118,10 @@ while running:
         ball.x += dx
         ball.y += dy
 
+        ball_trail.append((ball.centerx, ball.centery))
+        if len(ball_trail) > TRAIL_LENGTH:
+            ball_trail.pop(0)
+
     if ball.left <= 0 or ball.right >= WIDTH:
         dx *= -1
     if ball.top <= 0:
@@ -121,6 +130,7 @@ while running:
         lose_sound.play()
         ball.x, ball.y = WIDTH // 2, HEIGHT // 2
         dx, dy = 4 * level, -4 * level
+        ball_trail = []
 
     if ball.colliderect(paddle):
         dy *= -1
@@ -149,6 +159,11 @@ while running:
 
     for rect, _ in flash_bricks:
         pygame.draw.rect(screen, WHITE, rect)
+
+    for i, (x, y) in enumerate(ball_trail):
+        alpha = int(255 * (i + 1) / TRAIL_LENGTH)
+        trail_color = (alpha, alpha, alpha)
+        pygame.draw.circle(screen, trail_color, (x, y), BALL_SIZE // 2)
 
     pygame.draw.rect(screen, WHITE, paddle)
     pygame.draw.ellipse(screen, WHITE, ball)

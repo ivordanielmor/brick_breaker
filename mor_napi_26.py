@@ -555,9 +555,6 @@
 # 4. Pontszám-popup
 # Gyorsan eltűnő nagy, átlátszó szám középen:
 
-# 4. Pontszám-popup
-# Gyorsan eltűnő nagy, átlátszó szám középen:
-
 # import pygame
 # import random
 # import time

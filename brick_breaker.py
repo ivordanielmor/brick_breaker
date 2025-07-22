@@ -1,5 +1,5 @@
-# 2. Labda „trail” effekt
-# Tárolj rövid listát az előző pozíciókból, és minden frame-ben rajzold ki halvány körként:
+# 3. Ütő squash-animáció
+# Ütő összenyomódása találat után:
 
 import pygame
 import random
@@ -15,6 +15,8 @@ PADDLE_SPEED = 5
 BALL_SIZE = 15
 FLASH_DURATION = 100
 WHITE = (255, 255, 255)
+SQUASH_DURATION = 100
+SQUASH_SCALE = 0.7
 
 pygame.init()
 pygame.mixer.init()
@@ -64,6 +66,9 @@ paused_music = False
 
 ball_trail = []
 TRAIL_LENGTH = 10
+
+squash_start_time = 0
+is_squashing = False
 
 running = True
 while running:
@@ -135,6 +140,8 @@ while running:
     if ball.colliderect(paddle):
         dy *= -1
         paddle_sound.play()
+        squash_start_time = current_time
+        is_squashing = True
 
     for brick in bricks[:]:
         rect, color = brick
@@ -165,7 +172,20 @@ while running:
         trail_color = (alpha, alpha, alpha)
         pygame.draw.circle(screen, trail_color, (x, y), BALL_SIZE // 2)
 
-    pygame.draw.rect(screen, WHITE, paddle)
+    if is_squashing and current_time - squash_start_time < SQUASH_DURATION:
+        squash_width = paddle.width * 1.1
+        squash_height = paddle.height * SQUASH_SCALE
+        squash_rect = pygame.Rect(
+            paddle.centerx - squash_width // 2,
+            paddle.centery - squash_height // 2,
+            squash_width,
+            squash_height
+        )
+        pygame.draw.rect(screen, WHITE, squash_rect)
+    else:
+        is_squashing = False
+        pygame.draw.rect(screen, WHITE, paddle)
+
     pygame.draw.ellipse(screen, WHITE, ball)
 
     font = pygame.font.SysFont(None, 36)

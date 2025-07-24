@@ -1,6 +1,5 @@
-# # 1. Pályatervezés adatstruktúra
-# # Készíts levels változót, ahol minden szint egy lista tégla-definíciókkal:
-# # levels így néz ki: {"pozíció": (x, y), "szín": COLOR_NÉV, "pont": ÉRTÉK}
+# 2. Tégla-objektumok
+# Alakítsd át a fenti levels[0] listát brick dict-ek listájává
 
 import pygame
 import random
@@ -27,11 +26,11 @@ POINT_MEDIUM = 20
 POINT_HIGH = 50
 
 levels = [
-    # 1. szint
+    # 1. szint = [0]
     [
-        {"pozíció": (50, 50), "szín": COLOR_RED, "pont": POINT_LOW},
-        {"pozíció": (150, 50), "szín": COLOR_BLUE, "pont": POINT_MEDIUM},
-        {"pozíció": (250, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
+        {"type": "brick", "pozíció": (50, 50), "szín": COLOR_RED, "pont": POINT_LOW},
+        {"type": "brick", "pozíció": (150, 50), "szín": COLOR_BLUE, "pont": POINT_MEDIUM},
+        {"type": "brick", "pozíció": (250, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
     ],
     # 2. szint
     [

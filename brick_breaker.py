@@ -1,7 +1,6 @@
-# HÁZI FELADAT
-# • Tervezd meg saját animációs effekted (pl. tégla összeomlás pixeles
-# darabokra).
-# • Állítsd be, hogy a flash animáció színe változzon a tégla értéke alapján.
+# # 1. Pályatervezés adatstruktúra
+# # Készíts levels változót, ahol minden szint egy lista tégla-definíciókkal:
+# # levels így néz ki: {"pozíció": (x, y), "szín": COLOR_NÉV, "pont": ÉRTÉK}
 
 import pygame
 import random
@@ -19,6 +18,39 @@ FLASH_DURATION = 100
 WHITE = (255, 255, 255)
 SQUASH_DURATION = 100
 SQUASH_SCALE = 0.7
+COLOR_RED = "red"
+COLOR_BLUE = "blue"
+COLOR_GREEN = "green"
+COLOR_YELLOW = "yellow"
+POINT_LOW = 10
+POINT_MEDIUM = 20
+POINT_HIGH = 50
+
+levels = [
+    # 1. szint
+    [
+        {"pozíció": (50, 50), "szín": COLOR_RED, "pont": POINT_LOW},
+        {"pozíció": (150, 50), "szín": COLOR_BLUE, "pont": POINT_MEDIUM},
+        {"pozíció": (250, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
+    ],
+    # 2. szint
+    [
+        {"pozíció": (50, 50), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
+        {"pozíció": (150, 50), "szín": COLOR_RED, "pont": POINT_LOW},
+        {"pozíció": (250, 50), "szín": COLOR_BLUE, "pont": POINT_MEDIUM},
+        {"pozíció": (350, 50), "szín": COLOR_GREEN, "pont": POINT_HIGH},
+    ],
+    # 3. szint
+    [
+        {"pozíció": (50, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
+        {"pozíció": (150, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
+        {"pozíció": (250, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
+        {"pozíció": (350, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
+        {"pozíció": (100, 80), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
+        {"pozíció": (200, 80), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
+        {"pozíció": (300, 80), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
+    ]
+]
 
 pygame.init()
 pygame.mixer.init()

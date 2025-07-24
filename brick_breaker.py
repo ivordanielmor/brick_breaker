@@ -1,6 +1,6 @@
-# 3. Kirajzolás
-# Minden frame-ben iteráld végig a bricks listát, és a dict-ből használd a "color" mezőt a
-# pygame.draw.rect()-hez.
+# 4. Törés és pontszám
+# Ha a labda ütközik egy tégla dict["rect"]-jével, adj hozzá dict["value"] pontot, és
+# távolítsd el a dict-et a listából.
 
 import pygame
 import random
@@ -176,11 +176,12 @@ while running:
             dy *= -1
             brick_sound.play()
             bricks.remove(brick)
+            score += brick["points"]  # Pontszám növelés
             flash_bricks.append((rect, brick["color"], current_time))
-            score += 1
             popup_start_time = current_time
             show_popup = True
             break
+
 
     flash_bricks = [(rect, color, start_time) for rect, color, start_time in flash_bricks if current_time - start_time < FLASH_DURATION]
     if len(bricks) == 0:

@@ -1,5 +1,6 @@
-# 2. Tégla-objektumok
-# Alakítsd át a fenti levels[0] listát brick dict-ek listájává
+# 3. Kirajzolás
+# Minden frame-ben iteráld végig a bricks listát, és a dict-ből használd a "color" mezőt a
+# pygame.draw.rect()-hez.
 
 import pygame
 import random
@@ -25,31 +26,41 @@ POINT_LOW = 10
 POINT_MEDIUM = 20
 POINT_HIGH = 50
 
+COLOR_MAP = {
+    "red": (255, 0, 0),
+    "blue": (0, 0, 255),
+    "green": (0, 255, 0),
+    "yellow": (255, 255, 0)
+}
+
+def create_level(num_bricks, color, points, y_start):
+    bricks = []
+    total_width = num_bricks * BRICK_WIDTH + (num_bricks - 1) * BRICK_GAP
+    start_x = (WIDTH - total_width) // 2
+    for i in range(num_bricks):
+        x = start_x + i * (BRICK_WIDTH + BRICK_GAP)
+        bricks.append({"pozíció": (x, y_start), "szín": color, "pont": points})
+    return bricks
+
 levels = [
-    # 1. szint = [0]
-    [
-        {"type": "brick", "pozíció": (50, 50), "szín": COLOR_RED, "pont": POINT_LOW},
-        {"type": "brick", "pozíció": (150, 50), "szín": COLOR_BLUE, "pont": POINT_MEDIUM},
-        {"type": "brick", "pozíció": (250, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
-    ],
-    # 2. szint
-    [
-        {"pozíció": (50, 50), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
-        {"pozíció": (150, 50), "szín": COLOR_RED, "pont": POINT_LOW},
-        {"pozíció": (250, 50), "szín": COLOR_BLUE, "pont": POINT_MEDIUM},
-        {"pozíció": (350, 50), "szín": COLOR_GREEN, "pont": POINT_HIGH},
-    ],
-    # 3. szint
-    [
-        {"pozíció": (50, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
-        {"pozíció": (150, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
-        {"pozíció": (250, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
-        {"pozíció": (350, 50), "szín": COLOR_GREEN, "pont": POINT_LOW},
-        {"pozíció": (100, 80), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
-        {"pozíció": (200, 80), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
-        {"pozíció": (300, 80), "szín": COLOR_YELLOW, "pont": POINT_HIGH},
-    ]
+    create_level(10, COLOR_RED, POINT_LOW, 50),
+    create_level(10, COLOR_RED, POINT_LOW, 50) + create_level(10, COLOR_YELLOW, POINT_MEDIUM, 80),
+    create_level(10, COLOR_GREEN, POINT_LOW, 50) + create_level(10, COLOR_YELLOW, POINT_HIGH, 80) + create_level(10, COLOR_BLUE, POINT_MEDIUM, 110)
 ]
+
+def generate_bricks(level_index):
+    bricks = []
+    for brick_data in levels[level_index]:
+        pos = brick_data["pozíció"]
+        color = brick_data["szín"]
+        points = brick_data["pont"]
+        rect = pygame.Rect(pos[0], pos[1], BRICK_WIDTH, BRICK_HEIGHT)
+        bricks.append({
+            "rect": rect,
+            "color": COLOR_MAP[color],
+            "points": points
+        })
+    return bricks
 
 pygame.init()
 pygame.mixer.init()
@@ -69,48 +80,6 @@ brick_sound.set_volume(volume)
 paddle_sound.set_volume(volume)
 lose_sound.set_volume(volume)
 
-def get_random_row_colors():
-    return [tuple(random.randint(50, 255) for _ in range(3)) for _ in range(ROWS)]
-
-def generate_bricks():
-    bricks = []
-    row_colors = get_random_row_colors()
-    wall_width = COLS * BRICK_WIDTH + (COLS - 1) * BRICK_GAP
-    start_x = (WIDTH - wall_width) // 2
-    start_y = 50
-    for row in range(ROWS):
-        for col in range(COLS):
-            x = start_x + col * (BRICK_WIDTH + BRICK_GAP)
-            y = start_y + row * (BRICK_HEIGHT + BRICK_GAP)
-            brick = pygame.Rect(x, y, BRICK_WIDTH, BRICK_HEIGHT)
-            bricks.append((brick, row_colors[row]))
-    return bricks
-
-def create_particles(rect, color):
-    particles = []
-    for _ in range(15):
-        size = random.randint(3, 6)
-        x = rect.centerx
-        y = rect.centery
-        dx = random.uniform(-2, 2)
-        dy = random.uniform(-2, 2)
-        lifetime = random.randint(300, 600)
-        particles.append({
-            "x": x,
-            "y": y,
-            "dx": dx,
-            "dy": dy,
-            "size": size,
-            "color": color,
-            "spawn_time": pygame.time.get_ticks(),
-            "lifetime": lifetime
-        })
-    return particles
-
-bricks = generate_bricks()
-flash_bricks = []
-particle_effects = []
-
 paddle = pygame.Rect(350, 550, 100, 10)
 ball = pygame.Rect(WIDTH // 2, HEIGHT // 2, BALL_SIZE, BALL_SIZE)
 dx, dy = 4, -4
@@ -118,25 +87,24 @@ score = 0
 level = 1
 game_won = False
 paused_music = False
-
 ball_trail = []
 TRAIL_LENGTH = 10
-
 squash_start_time = 0
 is_squashing = False
-
 popup_start_time = 0
 popup_duration = 500
 show_popup = False
-
+flash_bricks = []
+particle_effects = []
+bricks = generate_bricks(level - 1)
 running = True
+
 while running:
     current_time = pygame.time.get_ticks()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_m:
                 paused_music = not paused_music
@@ -145,21 +113,20 @@ while running:
                 else:
                     pygame.mixer.music.unpause()
             if event.key == pygame.K_r:
-                bricks = generate_bricks()
+                bricks = generate_bricks(level - 1)
                 flash_bricks = []
                 particle_effects = []
                 score = 0
-                level = 1
                 dx, dy = 4, -4
                 game_won = False
                 ball.x, ball.y = WIDTH // 2, HEIGHT // 2
                 ball_trail = []
             if event.key == pygame.K_n and game_won:
-                bricks = generate_bricks()
+                level += 1
+                bricks = generate_bricks((level - 1) % len(levels))
                 flash_bricks = []
                 particle_effects = []
                 score = 0
-                level += 1
                 dx *= 1.2
                 dy *= 1.2
                 ball.x, ball.y = WIDTH // 2, HEIGHT // 2
@@ -204,13 +171,12 @@ while running:
         is_squashing = True
 
     for brick in bricks[:]:
-        rect, color = brick
+        rect = brick["rect"]
         if ball.colliderect(rect):
             dy *= -1
             brick_sound.play()
             bricks.remove(brick)
-            flash_bricks.append((rect, color, current_time))
-            particle_effects.extend(create_particles(rect, color))
+            flash_bricks.append((rect, brick["color"], current_time))
             score += 1
             popup_start_time = current_time
             show_popup = True
@@ -222,9 +188,11 @@ while running:
 
     screen.fill((0, 0, 0))
 
-    for brick, color in bricks:
-        pygame.draw.rect(screen, color, brick)
-        pygame.draw.rect(screen, WHITE, brick, 2)
+    for brick in bricks:
+        rect = brick["rect"]
+        color = brick["color"]
+        pygame.draw.rect(screen, color, rect)
+        pygame.draw.rect(screen, WHITE, rect, 2)
 
     for rect, color, _ in flash_bricks:
         pygame.draw.rect(screen, color, rect)
@@ -249,18 +217,6 @@ while running:
         pygame.draw.rect(screen, WHITE, paddle)
 
     pygame.draw.ellipse(screen, WHITE, ball)
-
-    for particle in particle_effects[:]:
-        age = current_time - particle["spawn_time"]
-        if age > particle["lifetime"]:
-            particle_effects.remove(particle)
-            continue
-        particle["x"] += particle["dx"]
-        particle["y"] += particle["dy"]
-        alpha = max(0, 255 - int(255 * (age / particle["lifetime"])))
-        surf = pygame.Surface((particle["size"], particle["size"]), pygame.SRCALPHA)
-        surf.fill((*particle["color"], alpha))
-        screen.blit(surf, (particle["x"], particle["y"]))
 
     font = pygame.font.SysFont(None, 36)
     screen.blit(font.render(f"Pontszám: {score}   Szint: {level}", True, WHITE), (10, 10))

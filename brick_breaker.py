@@ -25,17 +25,17 @@ COLOR_BLUE = "blue"
 COLOR_GREEN = "green"
 COLOR_YELLOW = "yellow"
 COLOR_GOLD = "gold"
-POINT_LOW = 10
-POINT_MEDIUM = 20
-POINT_HIGH = 50
-POINT_GOLD = 60  # Arany tégla pontszáma
+POINT_LOW = 1
+POINT_MEDIUM = 1
+POINT_HIGH = 1
+POINT_GOLD = 5  # Arany tégla pontszáma
 
 COLOR_MAP = {
     "red": (255, 0, 0),
     "blue": (0, 0, 255),
     "green": (0, 255, 0),
     "yellow": (255, 255, 0),
-    "gold": (255, 215, 0)  # Arany szín
+    "gold": (212, 175, 55)  # Arany szín
 }
 
 def create_level(num_bricks, color, points, y_start):
@@ -201,8 +201,10 @@ while True:
                 bricks.remove(brick)
                 if i == gold_brick_index and current_time - gold_brick_time < gold_brick_duration:
                     score += POINT_GOLD  # Arany tégla pontszám
+                    popup_text = "+5"  # Popup szöveg aranytéglánál
                 else:
                     score += brick["points"]
+                    popup_text = f"+{brick['points']}"  # Popup szöveg normál téglánál
                 flash_bricks.append((rect, brick["color"], current_time))
                 popup_start_time = current_time
                 show_popup = True
@@ -257,7 +259,7 @@ while True:
 
         if show_popup and current_time - popup_start_time < popup_duration:
             popup_font = pygame.font.SysFont(None, 100)
-            popup_surface = popup_font.render("+1", True, (255, 255, 255))
+            popup_surface = popup_font.render(popup_text, True, (255, 255, 255))  # Módosított sor
             popup_surface.set_alpha(200 - int(200 * (current_time - popup_start_time) / popup_duration))
             popup_rect = popup_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
             screen.blit(popup_surface, popup_rect)

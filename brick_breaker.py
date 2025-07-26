@@ -1,9 +1,3 @@
-# HÁZI FELADAT
-# • Tervezd meg legalább 3 különböző szint adatszerkezetét (egyszerű,
-# közepes, nehéz), és váltogasd őket a játék során! Ezt úgy csináld meg hogy készítesz egy lobbyt ahol ki van írva szépen hogy: easy, medium, hard és hogyha ezeket lenyomjuk akkor a megadott pályán találjuk magunkat. Nyílván a kilépést is tegyük elérhetővé ha végeztünk a pályával. 
-# • Adj hozzá jutalomtégla‐effektust: nagyobb pontérték, külön effekt vagy
-# hang!
-
 import pygame
 import random
 import time

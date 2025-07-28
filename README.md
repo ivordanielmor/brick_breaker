@@ -1,31 +1,30 @@
-# Brick Breaker – Classic Game Built with Pygame
+# Brick Breaker – Classic Arcade Game Built with Pygame
 
-This is a classic **Brick Breaker** game created using the [Pygame](https://www.pygame.org/news) library. You control a paddle to bounce a ball and break bricks. Score points for each brick broken. Golden bricks appear occasionally and grant bonus points. The game includes animated effects, sound, music, and multiple difficulty levels.
+This is a modern version of the classic **Brick Breaker** game, created using the [Pygame](https://www.pygame.org/news) library. Players control a paddle to bounce a ball and destroy bricks. Golden bricks give bonus points, and the game features animated effects, sound, and multiple difficulty levels.
 
 ---
 
-## 🌹️ Gameplay
+## 🕹️ Gameplay
 
-- Control the paddle using arrow keys.
-- Bounce the ball to break bricks.
-- Different bricks may require multiple hits or give more points.
-- Golden bricks grant 5 bonus points when destroyed.
-- Lose the ball and restart the level.
-- Choose between 3 difficulty levels.
-- Enjoy background music and sound effects.
+- Use arrow keys to move the paddle left and right.
+- The ball bounces off the paddle and bricks to destroy them.
+- Break normal bricks for 1 point.
+- Golden bricks appear randomly and are worth 5 points.
+- The game is over when the ball falls below the screen.
+- Choose from 3 difficulty levels: Easy, Medium, Hard.
 
 ---
 
 ## 🧱 Structure
 
-- **Pygame window:** Fixed-size game field with UI elements.
+- **Pygame window:** Resizable game screen with HUD showing score and level.
 - **Main features:**
   - Paddle and ball movement
-  - Multiple brick types (including golden bricks)
-  - Animated effects (ball trail, paddle squash)
-  - Sound and music system (mute with `M`)
-  - Difficulty selection screen
-  - Restart and navigation options (R, N, Q)
+  - Brick collision detection and scoring
+  - Special golden bricks for bonus points
+  - Background music and sound effects (toggle with `M`)
+  - Restart, quit, and return to level select with hotkeys
+- **Main game loop:** Manages game states, input, collision, and rendering.
 
 ---
 
@@ -36,7 +35,7 @@ This is a classic **Brick Breaker** game created using the [Pygame](https://www.
 - [Python 3](https://www.python.org/)
 - [Pygame](https://www.pygame.org/news)
 
-Install pygame with pip:
+Install Pygame with pip:
 
 ```bash
 pip install pygame
@@ -54,17 +53,18 @@ python brick_breaker.py
 
 ## 🧠 Features Overview
 
-- 3 selectable difficulty levels (Easy, Medium, Hard)
-- Animated paddle squash and ball trail effects
-- Special golden bricks worth extra points
-- Background music and sound effects (mute/unmute with `M`)
-- Restart level with `R`, return to lobby with `N`, and quit with `Q`
+- Classic brick breaker gameplay  
+- 3 difficulty levels  
+- Golden bricks that give bonus points  
+- Animated ball and paddle effects  
+- Music and sound effects (toggle with `M`)  
+- Hotkeys: `R` to restart, `N` for level select, `Q` to quit  
 
 ---
 
 ## 📷 Screenshot
 
-![Screenshot](./images/screenshot.PNG)
+![Screenshot](./images/screenshot.png)
 
 ---
 
@@ -74,38 +74,37 @@ This project is free to use for learning purposes.
 
 ---
 
-**Have fun playing! 🧱**
+**Have fun breaking bricks! 🧱🎉**
 
 ---
 
-# Brick Breaker – Klasszikus játék Pygame alapokon
+# Brick Breaker – Klasszikus Pygame-alapú téglatörő játék
 
-Ez egy klasszikus **Brick Breaker** játék, amelyet a [Pygame](https://www.pygame.org/news) könyvtár segítségével készítettünk. Az ütőddel irányítod a labdát, amely színes téglákat tör össze. Pontokat kapsz minden eltüntetett tégláért. Időnkként aranytéglák jelennek meg, amelyek extra pontot érnek. A játék animációkkal, zenével, hangeffektekkel és többféle nehézségi szinttel rendelkezik.
+Ez egy modern változata a klasszikus **Brick Breaker** játéknak, a [Pygame](https://www.pygame.org/news) könyvtár segítségével készült. A játékos egy ütőt irányít, amellyel visszaveri a labdát, hogy eltörje a színes téglákat. Az arany téglák extra pontokat érnek, és a játék több nehézségi szintet, animációkat és hanghatásokat is tartalmaz.
 
 ---
 
-## 🔹 Játékmenet
+## 🕹️ Játékmenet
 
-- A nyilakkal mozgatod az ütőt.
-- A labdával kell eltüntetni a téglákat.
-- Egyes téglák több találatot igényelnek, vagy több pontot adnak.
-- Az aranytéglák 5 bónuszpontot érnek.
-- Ha elveszítetted a labdát, újrakezdődik a szint.
-- Három nehézségi szint közül választhatsz.
-- Élvezd a zenét és a hangeffekteket!
+- A nyilakkal mozgasd az ütőt balra és jobbra.
+- A labda visszapattan az ütőről és a téglákról.
+- A normál téglák 1 pontot érnek.
+- Véletlenszerűen megjelenő arany téglák 5 pontot adnak.
+- A játék akkor ér véget, ha a labda leesik.
+- 3 nehézségi szint választható: Easy, Medium, Hard.
 
 ---
 
 ## 🧱 Felépítés
 
-- **Pygame ablak:** Fix méretű játéktér UI elemekkel.
-- **Főbb funkciók:**
-  - Ütő és labda mozgás
-  - Különböző tégla típusok (pl. aranytégla)
-  - Animációk (labdanyom, ütő deformáció)
-  - Hangeffektek és háttérzene (M gombbal kapcsolható)
-  - Nehézségi szint kiválasztása
-  - Újrakezdés és navigációs opciók (R, N, Q)
+- **Pygame ablak:** Átméretezhető képernyő, amely mutatja az aktuális pontszámot és szintet.
+- **Fő funkciók:**
+  - Ütő és labda mozgatása
+  - Téglaütközés-ellenőrzés és pontozás
+  - Speciális arany téglák extra pontért
+  - Háttérzene és hangeffektek (`M` gombbal ki-/bekapcsolható)
+  - Újrakezdés, kilépés és szintválasztás gyorsgombokkal
+- **Fő játékhurok:** Kezeli az eseményeket, ütközést, rajzolást és játékállapotokat
 
 ---
 
@@ -134,17 +133,18 @@ python brick_breaker.py
 
 ## 🧠 Funkciók összefoglalása
 
-- 3 választható nehézségi szint (Easy, Medium, Hard)
-- Animált hatások: labdanyom és ütő deformáció
-- Speciális aranytéglák extra pontértékkel
-- Háttérzene és hangeffektek (`M` gombbal kapcsolható)
-- R: újrakezdés, N: vissza a lobbyhoz, Q: kilépés
+- Klasszikus téglatörő játékmenet  
+- 3 választható nehézségi szint  
+- Arany téglák extra pontért  
+- Animált ütő és labda  
+- Zene és hangok (`M` gombbal)  
+- `R`: újrakezdés, `N`: vissza a szintválasztóhoz, `Q`: kilépés  
 
 ---
 
 ## 📷 Képernyőkép
 
-![Képernyőkép](./images/screenshot.PNG)
+![Képernyőkép](./images/screenshot.png)
 
 ---
 
@@ -154,4 +154,4 @@ Ez a projekt tanulási célokra szabadon használható.
 
 ---
 
-**Kellemes játékot! 🧱**
+**Kellemes játékot! 🧱🙂**
